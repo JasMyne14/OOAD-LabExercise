@@ -1,0 +1,5 @@
+*** SEMINAR PERFORMANCE REPORT ***
+Generated on: 2026-02-06
+
+ID: S001       | Student: Jasmyne Yap     | Oral   | Avg Score: 18.00 | Status: COMPLETED
+ID: S002       | Student: Wan Hanani      | Poster [Board: B-01] | Avg Score: 14.00 | Status: COMPLETED

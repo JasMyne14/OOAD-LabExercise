@@ -1,0 +1,17 @@
+EVENT RUN SHEET & PROTOCOL
+Event: Annual Research Seminar
+Generated: 2026-02-06
+=========================================================================
+TIME       | ACTIVITY / MILESTONE                     | REMARKS             
+=========================================================================
+14:00      | Guest Arrival & Registration             | Front Desk Team     
+14:15      | Welcoming Speech (Dean)                  | Stage Ready         
+14:30      | Keynote: Innovation in Tech              | Projector On        
+-------------------------------------------------------------------------
+15:00      | AWARD CEREMONY COMMENCES                 | MC Announce         
+           |  - Best Oral Presenter                   | Prepare Trophy      
+           |  - Best Poster Presenter                 | Prepare Trophy      
+           |  - People's Choice Award                 | Check Live Votes    
+-------------------------------------------------------------------------
+15:45      | Photography Session                      | Group Photo         
+16:00      | Refreshments & End                       | Catering Team       

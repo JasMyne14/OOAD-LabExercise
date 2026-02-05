@@ -1,0 +1,30 @@
+=== SEMINAR SCHEDULE ===
+
+SESSION: S-2659
+  Date: 14/04/2026
+  Time: 09:00 - 12:00
+  Venue: DTC
+  Type: Oral
+  
+Evaluators:
+    - Prof. Josh (E001)
+  
+Presentations:
+    - "Roses Are Blue" by Jasmyne Yap
+
+--------------------------------------------------
+
+SESSION: S-9533
+  Date: 16/04/2026
+  Time: 14:00 - !6:00
+  Venue: MPH
+  Type: Poster
+  
+Evaluators:
+    - Dr. Lim (E002)
+  
+Presentations:
+    - "Violets are Blue" by Wan Hanani
+
+--------------------------------------------------
+
