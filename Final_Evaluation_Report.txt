@@ -1,7 +1,65 @@
-*** SEMINAR PERFORMANCE REPORT ***
-Generated on: 2026-02-06
+*************************************************************
+              DETAILED SEMINAR EVALUATION REPORT             
+             Generated on: 2026-02-06
+*************************************************************
 
-ID: S002       | Student: Wan Hanani      | Poster [Board: B-01] | Avg Score: 16.00 | Status: COMPLETED
-ID: S001       | Student: Jasmyne Yap     | Poster [Board: B-02] | Avg Score: 17.00 | Status: COMPLETED
-ID: S003       | Student: Enath           | Oral   | Avg Score: 16.00 | Status: COMPLETED
-ID: S004       | Student: Nurul           | Oral   | Avg Score: 14.00 | Status: COMPLETED
+STUDENT: Wan Hanani                | ID: S002
+TITLE:   Violets are Blue                                  
+TYPE:    Poster [Board: B-01]     
+-------------------------------------------------------------
+   > Evaluator: Dr. Lim
+     [Scores] Clarity: 4 | Method: 3 | Results: 4 | Pres: 4
+     [Comment] "Good."
+
+   > Evaluator: Prof. Josh
+     [Scores] Clarity: 4 | Method: 4 | Results: 5 | Pres: 4
+     [Comment] "Presentation was enjoyable."
+
+FINAL AVERAGE SCORE: 16.00 / 20.00
+=============================================================
+
+STUDENT: Jasmyne Yap               | ID: S001
+TITLE:   CyberSecurity                                     
+TYPE:    Poster [Board: B-02]     
+-------------------------------------------------------------
+   > Evaluator: Dr. Lim
+     [Scores] Clarity: 4 | Method: 4 | Results: 5 | Pres: 5
+     [Comment] "Amazing"
+
+   > Evaluator: Prof. Josh
+     [Scores] Clarity: 4 | Method: 3 | Results: 4 | Pres: 5
+     [Comment] "Good work."
+
+FINAL AVERAGE SCORE: 17.00 / 20.00
+=============================================================
+
+STUDENT: Enath                     | ID: S003
+TITLE:   Perfect Data Mining                               
+TYPE:    Oral                     
+-------------------------------------------------------------
+   > Evaluator: Prof. Josh
+     [Scores] Clarity: 4 | Method: 4 | Results: 5 | Pres: 4
+     [Comment] "Good flow."
+
+   > Evaluator: Dr. Lim
+     [Scores] Clarity: 4 | Method: 4 | Results: 3 | Pres: 4
+     [Comment] "Well Done"
+
+FINAL AVERAGE SCORE: 16.00 / 20.00
+=============================================================
+
+STUDENT: Nurul                     | ID: S004
+TITLE:   Engineering with Web Engineers                    
+TYPE:    Oral                     
+-------------------------------------------------------------
+   > Evaluator: Dr. Lim
+     [Scores] Clarity: 4 | Method: 3 | Results: 3 | Pres: 2
+     [Comment] "Can Improve."
+
+   > Evaluator: Prof. Josh
+     [Scores] Clarity: 3 | Method: 4 | Results: 5 | Pres: 4
+     [Comment] "Good Presentation Flow"
+
+FINAL AVERAGE SCORE: 14.00 / 20.00
+=============================================================
+

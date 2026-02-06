@@ -188,133 +188,166 @@ public class CoordinatorView extends JPanel {
         return panel;
     }
 
-    // --- TAB 3: Reports ---
-    // Generate Seminar Schedule(txt), Final Evaluation Report(.txt), Analytics Dashboard (live)
+    // --- TAB 3: Reports & Analytics ---
+    // Generate Seminar Schedule(.txt), Detailed Evaluation Report(.txt), Analytics Dashboard (live)
+    private JPanel createReportPanel() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
         
-        private JPanel createReportPanel() {
-            JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
-            JButton scheduleBtn = new JButton("Generate Seminar Schedule (.txt)");
-            JButton reportBtn = new JButton("Generate Final Evaluation Report (.txt)");
-            JButton analyticsBtn = new JButton("Show Analytics Dashboard");
+        JButton scheduleBtn = new JButton("Generate Seminar Schedule (.txt)");
+        JButton reportBtn = new JButton("Generate Detailed Evaluation Report (.txt)");
+        JButton analyticsBtn = new JButton("Show Analytics Dashboard");
 
-            Dimension size = new Dimension(280, 50);
-            scheduleBtn.setPreferredSize(size); 
-            reportBtn.setPreferredSize(size);
-            analyticsBtn.setPreferredSize(size);
+        Dimension size = new Dimension(280, 50);
+        scheduleBtn.setPreferredSize(size); 
+        reportBtn.setPreferredSize(size);
+        analyticsBtn.setPreferredSize(size);
 
-            // BUTTON STYLING ---
-            // 1. Schedule Button (Blue)
-            scheduleBtn.setBackground(new Color(184, 215, 233)); 
-            scheduleBtn.setForeground(Color.BLACK);            
-            scheduleBtn.setFont(new Font("SansSerif", Font.BOLD, 12)); 
+        // --- BUTTON STYLING (Pastel Professional Theme) ---
+        
+        // 1. Schedule Button (Pastel Blue)
+        scheduleBtn.setBackground(new Color(184, 215, 233)); 
+        scheduleBtn.setForeground(Color.BLACK);            
+        scheduleBtn.setFont(new Font("SansSerif", Font.BOLD, 12)); 
+        scheduleBtn.setFocusable(false);
 
-            // 2. Report Button (Green)
-            reportBtn.setBackground(new Color(191, 227, 180));  
-            reportBtn.setForeground(Color.BLACK);
-            reportBtn.setFont(new Font("SansSerif", Font.BOLD, 12));
+        // 2. Report Button (Pastel Green)
+        reportBtn.setBackground(new Color(191, 227, 180));  
+        reportBtn.setForeground(Color.BLACK);
+        reportBtn.setFont(new Font("SansSerif", Font.BOLD, 12));
+        reportBtn.setFocusable(false);
 
-            // 3. Analytics Button (Beige)
-            analyticsBtn.setBackground(new Color(245, 245, 220));
-            analyticsBtn.setForeground(Color.BLACK);
-            analyticsBtn.setFont(new Font("SansSerif", Font.BOLD, 12));
+        // 3. Analytics Button (Beige)
+        analyticsBtn.setBackground(new Color(245, 245, 220));
+        analyticsBtn.setForeground(Color.BLACK);
+        analyticsBtn.setFont(new Font("SansSerif", Font.BOLD, 12));
+        analyticsBtn.setFocusable(false);
 
-            // 1. Generate Schedule Text File
-            scheduleBtn.addActionListener(e -> {
-                try (FileWriter fw = new FileWriter("Seminar_Schedule.txt")) {
-                    fw.write("=== SEMINAR SCHEDULE ===\n\n");
-                    
-                    for(SeminarSession s : manager.getAllSessions()) {
-                        fw.write("SESSION: " + s.getSessionId() + "\n");
-                        fw.write("  Date: " + s.getDate() + "\n");
-                        fw.write("  Time: " + s.getTime() + "\n");
-                        fw.write("  Venue: " + s.getVenue() + "\n");
-                        fw.write("  Type: " + s.getType() + "\n");
-                        
-                        // List Evaluators
-                        fw.write("  \nEvaluators:\n");
-                        if(s.getEvaluatorIds().isEmpty()) fw.write("    (No evaluators assigned)\n");
-                        else { 
-                            for(String eId : s.getEvaluatorIds()) { 
-                                User u = manager.getUsersByRole(Evaluator.class).stream().filter(user -> user.getId().equals(eId)).findFirst().orElse(null); 
-                                fw.write("    - " + (u != null ? u.getUsername() : "Unknown") + " (" + eId + ")\n"); 
-                            } 
-                        }
+        // --------------------------------------------------
 
-                        // List Presentations
-                        fw.write("  \nPresentations:\n");
-                        if(s.getStudentIds().isEmpty()) fw.write("    (No presentations assigned yet)\n");
-                        else { 
-                            for(String studId : s.getStudentIds()) { 
-                                Presentation p = manager.getPresentationByStudent(studId); 
-                                if(p != null) fw.write("    - \"" + p.getTitle() + "\" by " + p.getStudentName() + "\n"); 
-                            } 
-                        }
-                        fw.write("\n--------------------------------------------------\n\n");
-                    }
-                    JOptionPane.showMessageDialog(this, "Schedule exported to 'Seminar_Schedule.txt'");
-                } catch(Exception ex) { ex.printStackTrace(); }
-            });
-
-            // 2. Evaluation Report (shows Board ID for Posters)
-            reportBtn.addActionListener(e -> {
-                try (FileWriter fw = new FileWriter("Final_Evaluation_Report.txt")) {
-                    fw.write("*** SEMINAR PERFORMANCE REPORT ***\n");
-                    fw.write("Generated on: " + java.time.LocalDate.now() + "\n\n");
-                    
-                    for(Presentation p : manager.getAllPresentations()) {
-                        // Calculate average score 
-                        double total = p.getEvaluations().stream().mapToInt(Evaluation::getTotal).average().orElse(0.0);
-                        String status = p.getEvaluations().isEmpty() ? "PENDING" : "COMPLETED";
-                        
-                        // --- Board ID
-                        String boardStr = "";
-                        if(p.getType().equalsIgnoreCase("Poster") && p.getBoardId() != null) {
-                            boardStr = " [Board: " + p.getBoardId() + "]";
-                        }
-                        // ----------------------------------------
-
-                        fw.write(String.format("ID: %-10s | Student: %-15s | %-6s%s | Avg Score: %5.2f | Status: %s\n", 
-                            p.getStudentId(), p.getStudentName(), p.getType(), boardStr, total, status));
-                    }
-                    JOptionPane.showMessageDialog(this, "Report exported to 'Final_Evaluation_Report.txt'");
-                } catch(Exception ex) { ex.printStackTrace(); }
-            });
-
-            // 3. Analytics Dashboard
-            analyticsBtn.addActionListener(e -> {
-                int totalPres = manager.getAllPresentations().size();
-                int evaluated = 0;
-                double sumScores = 0;
-                int countScores = 0;
+        // 1. Generate Schedule Text File
+        scheduleBtn.addActionListener(e -> {
+            try (FileWriter fw = new FileWriter("Seminar_Schedule.txt")) {
+                fw.write("=== SEMINAR SCHEDULE ===\n\n");
                 
-                // Calculate stats
+                for(SeminarSession s : manager.getAllSessions()) {
+                    fw.write("SESSION: " + s.getSessionId() + "\n");
+                    fw.write("  Date: " + s.getDate() + " | Time: " + s.getTime() + "\n");
+                    fw.write("  Venue: " + s.getVenue() + " (" + s.getType() + ")\n");
+                    
+                    // List Evaluators
+                    fw.write("  \nEvaluators:\n");
+                    if(s.getEvaluatorIds().isEmpty()) fw.write("    (No evaluators assigned)\n");
+                    else { 
+                        for(String eId : s.getEvaluatorIds()) { 
+                            User u = manager.getUsersByRole(Evaluator.class).stream().filter(user -> user.getId().equals(eId)).findFirst().orElse(null); 
+                            fw.write("    - " + (u != null ? u.getUsername() : "Unknown") + " (" + eId + ")\n"); 
+                        } 
+                    }
+
+                    // List Presentations
+                    fw.write("  \nPresentations:\n");
+                    if(s.getStudentIds().isEmpty()) fw.write("    (No presentations assigned yet)\n");
+                    else { 
+                        for(String studId : s.getStudentIds()) { 
+                            Presentation p = manager.getPresentationByStudent(studId); 
+                            if(p != null) fw.write("    - \"" + p.getTitle() + "\" by " + p.getStudentName() + "\n"); 
+                        } 
+                    }
+                    fw.write("\n--------------------------------------------------\n\n");
+                }
+                JOptionPane.showMessageDialog(this, "Schedule exported to 'Seminar_Schedule.txt'");
+            } catch(Exception ex) { ex.printStackTrace(); }
+        });
+
+        // 2. Generate DETAILED Evaluation Report (Rubrics + Comments + Board IDs)
+        reportBtn.addActionListener(e -> {
+            try (FileWriter fw = new FileWriter("Final_Evaluation_Report.txt")) {
+                fw.write("*************************************************************\n");
+                fw.write("              DETAILED SEMINAR EVALUATION REPORT             \n");
+                fw.write("             Generated on: " + java.time.LocalDate.now() + "\n");
+                fw.write("*************************************************************\n\n");
+                
                 for(Presentation p : manager.getAllPresentations()) {
-                    if(!p.getEvaluations().isEmpty()) {
-                        evaluated++;
+                    // Header Info: Check if it's a Poster to add Board ID
+                    String typeStr = p.getType();
+                    if("Poster".equalsIgnoreCase(typeStr) && p.getBoardId() != null) {
+                        typeStr += " [Board: " + p.getBoardId() + "]";
+                    }
+
+                    fw.write(String.format("STUDENT: %-25s | ID: %s\n", p.getStudentName(), p.getStudentId()));
+                    fw.write(String.format("TITLE:   %-50s\n", p.getTitle()));
+                    fw.write(String.format("TYPE:    %-25s\n", typeStr));
+                    fw.write("-------------------------------------------------------------\n");
+
+                    if(p.getEvaluations().isEmpty()) {
+                        fw.write("STATUS:  PENDING (No evaluations yet)\n");
+                    } else {
+                        double totalSum = 0;
+                        
+                        // Loop through each evaluator's feedback
                         for(Evaluation ev : p.getEvaluations()) {
-                            sumScores += ev.getTotal();
-                            countScores++;
+                            // Find Evaluator Name
+                            User u = manager.getUsersByRole(Evaluator.class).stream()
+                                .filter(user -> user.getId().equals(ev.getEvaluatorId()))
+                                .findFirst().orElse(null);
+                            String eName = (u != null) ? u.getUsername() : ev.getEvaluatorId();
+
+                            fw.write(String.format("   > Evaluator: %s\n", eName));
+                            // PRINT RUBRICS (Detailed Breakdown)
+                            fw.write(String.format("     [Scores] Clarity: %d | Method: %d | Results: %d | Pres: %d\n",
+                                ev.getScore1(), ev.getScore2(), ev.getScore3(), ev.getScore4()));
+                            // PRINT COMMENT
+                            fw.write(String.format("     [Comment] \"%s\"\n", ev.getComments()));
+                            fw.write("\n");
+                            
+                            totalSum += ev.getTotal();
                         }
+                        
+                        // Final Average Calculation
+                        double avg = totalSum / p.getEvaluations().size();
+                        fw.write(String.format("FINAL AVERAGE SCORE: %.2f / 20.00\n", avg));
+                    }
+                    fw.write("=============================================================\n\n");
+                }
+                JOptionPane.showMessageDialog(this, "Detailed Report exported to 'Final_Evaluation_Report.txt'");
+            } catch(Exception ex) { ex.printStackTrace(); }
+        });
+
+        // 3. Analytics Dashboard
+        analyticsBtn.addActionListener(e -> {
+            int totalPres = manager.getAllPresentations().size();
+            int evaluated = 0;
+            double sumScores = 0;
+            int countScores = 0;
+            
+            // Calculate stats
+            for(Presentation p : manager.getAllPresentations()) {
+                if(!p.getEvaluations().isEmpty()) {
+                    evaluated++;
+                    for(Evaluation ev : p.getEvaluations()) {
+                        sumScores += ev.getTotal();
+                        countScores++;
                     }
                 }
-                double globalAvg = countScores > 0 ? sumScores / countScores : 0;
-                int completion = totalPres > 0 ? (evaluated * 100 / totalPres) : 0;
-               
-                // Display in dialog
-                String msg = ">> DATA ANALYTICS DASHBOARD <<\n\n" +
-                            "Total Presentations Registered: " + totalPres + "\n" +
-                            "Evaluation Progress: " + completion + "% (" + evaluated + "/" + totalPres + ")\n" +
-                            "Overall Average Score: " + String.format("%.2f", globalAvg) + " / 20.00\n" +
-                            "Active Sessions: " + manager.getAllSessions().size();
-                
-                JOptionPane.showMessageDialog(this, new JTextArea(msg), "Live Analytics", JOptionPane.INFORMATION_MESSAGE);
-            });
+            }
+            double globalAvg = countScores > 0 ? sumScores / countScores : 0;
+            int completion = totalPres > 0 ? (evaluated * 100 / totalPres) : 0;
+            
+            // Display in dialog
+            String msg = ">> DATA ANALYTICS DASHBOARD <<\n\n" +
+                         "Total Presentations Registered: " + totalPres + "\n" +
+                         "Evaluation Progress: " + completion + "% (" + evaluated + "/" + totalPres + ")\n" +
+                         "Overall Average Score: " + String.format("%.2f", globalAvg) + " / 20.00\n" +
+                         "Active Sessions: " + manager.getAllSessions().size();
+            
+            JOptionPane.showMessageDialog(this, new JTextArea(msg), "Live Analytics", JOptionPane.INFORMATION_MESSAGE);
+        });
 
-            panel.add(scheduleBtn); 
-            panel.add(reportBtn); 
-            panel.add(analyticsBtn);
-            return panel;
-        }
+        panel.add(scheduleBtn); 
+        panel.add(reportBtn); 
+        panel.add(analyticsBtn);
+        return panel;
+    }
 
     // --- TAB 4: Awards and Voting---
     private JPanel createAwardPanel() {
