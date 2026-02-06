@@ -1,12 +1,15 @@
 import java.io.Serializable;
 
+// Evaluation Class
 public class Evaluation implements Serializable {
+    
+    // Evaluation Criteria Scores and Comments
     private String evaluatorId;
     private int problemClarity; // Score 1
     private int methodology;    // Score 2
     private int results;        // Score 3
     private int presentation;   // Score 4
-    private String comments;
+    private String comments;    // Qualitative Feedback
 
     public Evaluation(String evaluatorId, int p, int m, int r, int pre, String comments) {
         this.evaluatorId = evaluatorId;
@@ -17,6 +20,7 @@ public class Evaluation implements Serializable {
         this.comments = comments;
     }
 
+    // Calculates the total score from all criteria
     public int getTotal() { return problemClarity + methodology + results + presentation; }
     
     public String getEvaluatorId() { return evaluatorId; }

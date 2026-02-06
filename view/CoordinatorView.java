@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.io.FileWriter;
 import java.io.File;
 
+// The Main Coordinator Dashboard View
+// Contains 5 Tabs for Session Management, Assignments, Reports, Awards, and User Management
+
 public class CoordinatorView extends JPanel {
     private SeminarManager manager;
     private JTabbedPane tabs;
@@ -15,7 +18,6 @@ public class CoordinatorView extends JPanel {
     private JComboBox<SeminarSession> assignSessionBox;
     private JList<User> assignEvaluatorList;
     private JList<Presentation> assignPresenterList;
-    
     private DefaultTableModel voteTableModel; 
     private DefaultTableModel userTableModel;
 
@@ -40,6 +42,7 @@ public class CoordinatorView extends JPanel {
         JPanel formPanel = new JPanel(new GridLayout(6, 2, 5, 5));
         formPanel.setBorder(BorderFactory.createTitledBorder("Create New Session"));
         
+        // Form Panel
         JTextField dateField = new JTextField();
         JTextField timeField = new JTextField();
         JTextField venueField = new JTextField();
@@ -52,15 +55,20 @@ public class CoordinatorView extends JPanel {
         formPanel.add(new JLabel("Type:")); formPanel.add(typeBox);
         formPanel.add(new JLabel("")); formPanel.add(createBtn);
 
+        // Table Panel (View Existing Sessions)
         String[] cols = {"Session ID", "Date", "Time", "Venue", "Type"};
         sessionTableModel = new DefaultTableModel(cols, 0);
         JTable table = new JTable(sessionTableModel);
         JButton deleteBtn = new JButton("Delete Selected Session");
 
+        // Create Button
         createBtn.addActionListener(e -> {
+            // Ensure fields are filled
             if(dateField.getText().isEmpty() || venueField.getText().isEmpty() || timeField.getText().isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please fill in all fields"); return;
             }
+
+            // Generate unique Session ID and create session
             SeminarSession s = new SeminarSession(
                 "S-" + (1000 + (int)(Math.random() * 9000)), 
                 dateField.getText(), 
@@ -68,30 +76,46 @@ public class CoordinatorView extends JPanel {
                 venueField.getText(), 
                 (String)typeBox.getSelectedItem()
             );
-            manager.createSession(s); refreshAllData();
+
+            manager.createSession(s); refreshAllData(); // Save and refresh
+            
+            // Clear form
             dateField.setText(""); timeField.setText(""); venueField.setText(""); 
             JOptionPane.showMessageDialog(this, "Session Created Successfully!");
         });
 
+        // Delete Button
         deleteBtn.addActionListener(e -> {
-            int row = table.getSelectedRow(); if(row == -1) return;
+            int row = table.getSelectedRow(); 
+            if(row == -1) return; // No selection
+
             String sId = (String) sessionTableModel.getValueAt(row, 0);
+            
+            // Find and delete session
             SeminarSession target = manager.getAllSessions().stream().filter(s -> s.getSessionId().equals(sId)).findFirst().orElse(null);
             if(target != null) { manager.deleteSession(target); refreshAllData(); }
         });
 
-        JPanel tablePanel = new JPanel(new BorderLayout()); tablePanel.add(new JScrollPane(table), BorderLayout.CENTER); tablePanel.add(deleteBtn, BorderLayout.SOUTH);
-        panel.add(formPanel, BorderLayout.NORTH); panel.add(tablePanel, BorderLayout.CENTER);
+        JPanel tablePanel = new JPanel(new BorderLayout()); 
+        tablePanel.add(new JScrollPane(table), BorderLayout.CENTER); 
+        tablePanel.add(deleteBtn, BorderLayout.SOUTH);
+
+        panel.add(formPanel, BorderLayout.NORTH); 
+        panel.add(tablePanel, BorderLayout.CENTER);
         return panel;
     }
 
     // --- TAB 2: Assign People ---
+    // Oral to Oral Sessions, Posters to Poster Sessions
     private JPanel createAssignmentPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
+
+        // Top Panel: Session Selection
         JPanel top = new JPanel(new FlowLayout());
         assignSessionBox = new JComboBox<>();
         top.add(new JLabel("Select Session to Configure:")); top.add(assignSessionBox);
         
+        // Center: Dual Lists (Evaluators left, Presenters right)
         JPanel center = new JPanel(new GridLayout(1, 2, 10, 10));
         assignEvaluatorList = new JList<>(new DefaultListModel<>());
         assignEvaluatorList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -103,26 +127,36 @@ public class CoordinatorView extends JPanel {
         
         center.add(p1); center.add(p2);
 
+        // Session Selection Logic
         assignSessionBox.addActionListener(e -> {
             SeminarSession s = (SeminarSession) assignSessionBox.getSelectedItem(); 
             if (s == null) return;
             
+            // 1. Setup Evaluator List
             DefaultListModel<User> eModel = (DefaultListModel<User>) assignEvaluatorList.getModel();
             eModel.clear();
             manager.getUsersByRole(Evaluator.class).forEach(eModel::addElement);
+            
+            // Highlight already assigned evaluators
             List<Integer> eIndices = new ArrayList<>();
             for (int i = 0; i < eModel.size(); i++) {
                 if (s.getEvaluatorIds().contains(eModel.get(i).getId())) eIndices.add(i);
             }
             assignEvaluatorList.setSelectedIndices(eIndices.stream().mapToInt(i -> i).toArray());
             
+
+            // 2. Setup Presenter List
             DefaultListModel<Presentation> pModel = (DefaultListModel<Presentation>) assignPresenterList.getModel();
             pModel.clear();
+
             for(Presentation p : manager.getAllPresentations()) {
+                // Only show matching type presentations
                 if(p.getType().equalsIgnoreCase(s.getType())) {
                     pModel.addElement(p);
                 }
             }
+
+            // Highlight already assigned presenters
             List<Integer> pIndices = new ArrayList<>();
             for (int i = 0; i < pModel.size(); i++) {
                 if (s.getStudentIds().contains(pModel.get(i).getStudentId())) pIndices.add(i);
@@ -130,19 +164,33 @@ public class CoordinatorView extends JPanel {
             assignPresenterList.setSelectedIndices(pIndices.stream().mapToInt(i -> i).toArray());
         });
 
+        // Save Assignments Logic
         JButton saveBtn = new JButton("Save Assignments");
         saveBtn.addActionListener(e -> {
-            SeminarSession s = (SeminarSession) assignSessionBox.getSelectedItem(); if(s == null) return;
-            List<String> eIds = new ArrayList<>(); for(User u : assignEvaluatorList.getSelectedValuesList()) eIds.add(u.getId());
-            List<String> sIds = new ArrayList<>(); for(Presentation p : assignPresenterList.getSelectedValuesList()) sIds.add(p.getStudentId());
-            manager.assignToSession(s, eIds, sIds); JOptionPane.showMessageDialog(this, "Assignments Saved!");
+            SeminarSession s = (SeminarSession) assignSessionBox.getSelectedItem(); 
+            if(s == null) return;
+
+            // Extract selected IDs
+            List<String> eIds = new ArrayList<>(); 
+            for(User u : assignEvaluatorList.getSelectedValuesList()) eIds.add(u.getId());
+            
+            List<String> sIds = new ArrayList<>(); 
+            for(Presentation p : assignPresenterList.getSelectedValuesList()) sIds.add(p.getStudentId());
+           
+           // Pass to manager
+            manager.assignToSession(s, eIds, sIds); 
+            JOptionPane.showMessageDialog(this, "Assignments Saved!");
         });
 
-        panel.add(top, BorderLayout.NORTH); panel.add(center, BorderLayout.CENTER); panel.add(saveBtn, BorderLayout.SOUTH);
+        panel.add(top, BorderLayout.NORTH); 
+        panel.add(center, BorderLayout.CENTER); 
+        panel.add(saveBtn, BorderLayout.SOUTH);
         return panel;
     }
 
-    // --- TAB 3: Reports (With Board ID Display) ---
+    // --- TAB 3: Reports ---
+    // Generate Seminar Schedule(txt), Final Evaluation Report(.txt), Analytics Dashboard (live)
+        
         private JPanel createReportPanel() {
             JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
             JButton scheduleBtn = new JButton("Generate Seminar Schedule (.txt)");
@@ -154,16 +202,35 @@ public class CoordinatorView extends JPanel {
             reportBtn.setPreferredSize(size);
             analyticsBtn.setPreferredSize(size);
 
-            // 1. Schedule Logic (Standard)
+            // BUTTON STYLING ---
+            // 1. Schedule Button (Blue)
+            scheduleBtn.setBackground(new Color(184, 215, 233)); 
+            scheduleBtn.setForeground(Color.BLACK);            
+            scheduleBtn.setFont(new Font("SansSerif", Font.BOLD, 12)); 
+
+            // 2. Report Button (Green)
+            reportBtn.setBackground(new Color(191, 227, 180));  
+            reportBtn.setForeground(Color.BLACK);
+            reportBtn.setFont(new Font("SansSerif", Font.BOLD, 12));
+
+            // 3. Analytics Button (Beige)
+            analyticsBtn.setBackground(new Color(245, 245, 220));
+            analyticsBtn.setForeground(Color.BLACK);
+            analyticsBtn.setFont(new Font("SansSerif", Font.BOLD, 12));
+
+            // 1. Generate Schedule Text File
             scheduleBtn.addActionListener(e -> {
                 try (FileWriter fw = new FileWriter("Seminar_Schedule.txt")) {
                     fw.write("=== SEMINAR SCHEDULE ===\n\n");
+                    
                     for(SeminarSession s : manager.getAllSessions()) {
                         fw.write("SESSION: " + s.getSessionId() + "\n");
                         fw.write("  Date: " + s.getDate() + "\n");
                         fw.write("  Time: " + s.getTime() + "\n");
                         fw.write("  Venue: " + s.getVenue() + "\n");
                         fw.write("  Type: " + s.getType() + "\n");
+                        
+                        // List Evaluators
                         fw.write("  \nEvaluators:\n");
                         if(s.getEvaluatorIds().isEmpty()) fw.write("    (No evaluators assigned)\n");
                         else { 
@@ -172,6 +239,8 @@ public class CoordinatorView extends JPanel {
                                 fw.write("    - " + (u != null ? u.getUsername() : "Unknown") + " (" + eId + ")\n"); 
                             } 
                         }
+
+                        // List Presentations
                         fw.write("  \nPresentations:\n");
                         if(s.getStudentIds().isEmpty()) fw.write("    (No presentations assigned yet)\n");
                         else { 
@@ -186,16 +255,18 @@ public class CoordinatorView extends JPanel {
                 } catch(Exception ex) { ex.printStackTrace(); }
             });
 
-            // 2. Evaluation Report (UPDATED: Now shows Board ID for Posters)
+            // 2. Evaluation Report (shows Board ID for Posters)
             reportBtn.addActionListener(e -> {
                 try (FileWriter fw = new FileWriter("Final_Evaluation_Report.txt")) {
                     fw.write("*** SEMINAR PERFORMANCE REPORT ***\n");
                     fw.write("Generated on: " + java.time.LocalDate.now() + "\n\n");
+                    
                     for(Presentation p : manager.getAllPresentations()) {
+                        // Calculate average score 
                         double total = p.getEvaluations().stream().mapToInt(Evaluation::getTotal).average().orElse(0.0);
                         String status = p.getEvaluations().isEmpty() ? "PENDING" : "COMPLETED";
                         
-                        // --- THE MISSING PIECE FOR FULL MARKS ---
+                        // --- Board ID
                         String boardStr = "";
                         if(p.getType().equalsIgnoreCase("Poster") && p.getBoardId() != null) {
                             boardStr = " [Board: " + p.getBoardId() + "]";
@@ -209,13 +280,14 @@ public class CoordinatorView extends JPanel {
                 } catch(Exception ex) { ex.printStackTrace(); }
             });
 
-            // 3. Analytics Dashboard (Standard)
+            // 3. Analytics Dashboard
             analyticsBtn.addActionListener(e -> {
                 int totalPres = manager.getAllPresentations().size();
                 int evaluated = 0;
                 double sumScores = 0;
                 int countScores = 0;
                 
+                // Calculate stats
                 for(Presentation p : manager.getAllPresentations()) {
                     if(!p.getEvaluations().isEmpty()) {
                         evaluated++;
@@ -227,7 +299,8 @@ public class CoordinatorView extends JPanel {
                 }
                 double globalAvg = countScores > 0 ? sumScores / countScores : 0;
                 int completion = totalPres > 0 ? (evaluated * 100 / totalPres) : 0;
-                
+               
+                // Display in dialog
                 String msg = ">> DATA ANALYTICS DASHBOARD <<\n\n" +
                             "Total Presentations Registered: " + totalPres + "\n" +
                             "Evaluation Progress: " + completion + "% (" + evaluated + "/" + totalPres + ")\n" +
@@ -237,20 +310,24 @@ public class CoordinatorView extends JPanel {
                 JOptionPane.showMessageDialog(this, new JTextArea(msg), "Live Analytics", JOptionPane.INFORMATION_MESSAGE);
             });
 
-            panel.add(scheduleBtn); panel.add(reportBtn); panel.add(analyticsBtn);
+            panel.add(scheduleBtn); 
+            panel.add(reportBtn); 
+            panel.add(analyticsBtn);
             return panel;
         }
 
-    // --- TAB 4: Awards (Redesigned "Run Sheet" Style) ---
+    // --- TAB 4: Awards and Voting---
     private JPanel createAwardPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         
+        // Editable Vote Table
         String[] cols = {"Student", "Title", "Input Votes (Double Click)"};
         voteTableModel = new DefaultTableModel(cols, 0) { 
             @Override public boolean isCellEditable(int row, int col) { return col == 2; } 
         };
         JTable voteTable = new JTable(voteTableModel);
         
+        // Save Votes
         JButton updateVotesBtn = new JButton("Save Vote Counts");
         updateVotesBtn.addActionListener(e -> {
             if(voteTable.isEditing()) voteTable.getCellEditor().stopCellEditing();
@@ -267,23 +344,30 @@ public class CoordinatorView extends JPanel {
 
         JTextArea resultsArea = new JTextArea(10, 40); resultsArea.setEditable(false); resultsArea.setFont(new Font("Monospaced", Font.BOLD, 14));
         
-        JButton calculateBtn = new JButton("Calculate Results");
+        // Calculate Winners (Best Oral, Best Poster, People's Choice)
+        JButton calculateBtn = new JButton("Generate Award Winners");
         calculateBtn.addActionListener(e -> {
-            Presentation bestOral = null, bestPoster = null, peopleChoice = null; double maxOral = -1, maxPoster = -1; int maxVote = -1;
+            Presentation bestOral = null, bestPoster = null, peopleChoice = null; 
+            double maxOral = -1, maxPoster = -1; int maxVote = -1;
+        
             for(Presentation p : manager.getAllPresentations()) {
                 double avg = p.getEvaluations().stream().mapToInt(Evaluation::getTotal).average().orElse(0.0);
+                
+                // Determine Category Winners based on Scores
                 if(p.getType().equals("Oral") && avg > maxOral) { maxOral = avg; bestOral = p; }
                 if(p.getType().equals("Poster") && avg > maxPoster) { maxPoster = avg; bestPoster = p; }
+                // Determine People's Choice based on Votes
                 if(p.getAudienceVotes() > maxVote) { maxVote = p.getAudienceVotes(); peopleChoice = p; }
             }
-            StringBuilder sb = new StringBuilder(">> CURRENT LEADERBOARD <<\n\n");
-            sb.append("GOLD AWARD (Oral):   ").append(bestOral != null ? bestOral.getStudentName() + " ("+String.format("%.2f", maxOral)+")" : "-").append("\n");
-            sb.append("GOLD AWARD (Poster): ").append(bestPoster != null ? bestPoster.getStudentName() + " ("+String.format("%.2f", maxPoster)+")" : "-").append("\n");
-            sb.append("AUDIENCE CHOICE:     ").append(peopleChoice != null ? peopleChoice.getStudentName() + " ("+maxVote+" votes)" : "-").append("\n");
+
+            StringBuilder sb = new StringBuilder(">> CURRENT BEST PRESENTER <<\n\n");
+            sb.append("BEST AWARD (Oral):   ").append(bestOral != null ? bestOral.getStudentName() + " ("+String.format("%.2f", maxOral)+")" : "-").append("\n");
+            sb.append("BEST AWARD (Poster): ").append(bestPoster != null ? bestPoster.getStudentName() + " ("+String.format("%.2f", maxPoster)+")" : "-").append("\n");
+            sb.append("PEOPLE'S CHOICE:     ").append(peopleChoice != null ? peopleChoice.getStudentName() + " ("+maxVote+" votes)" : "-").append("\n");
             resultsArea.setText(sb.toString());
         });
 
-        // --- NEW CREATIVE AGENDA FORMAT (Run Sheet) ---
+        // --- AGENDA FORMAT (Event Run Sheet) ---
         JButton agendaBtn = new JButton("Generate Event Run Sheet");
         agendaBtn.addActionListener(e -> {
              try (FileWriter fw = new FileWriter("Event_Run_Sheet.txt")) {
@@ -324,32 +408,53 @@ public class CoordinatorView extends JPanel {
     }
 
     // --- TAB 5: User Management ---
+    // Add and Delete Students/Evaluators
     private JPanel createUserManagementPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
+        // Input Form
         JPanel form = new JPanel(new GridLayout(4, 2, 5, 5));
         form.setBorder(BorderFactory.createTitledBorder("Add New User"));
-        JTextField idField = new JTextField(); JTextField nameField = new JTextField(); JComboBox<String> roleBox = new JComboBox<>(new String[]{"Student", "Evaluator"}); JButton addBtn = new JButton("Add User");
-        form.add(new JLabel("ID:")); form.add(idField); form.add(new JLabel("Name:")); form.add(nameField); form.add(new JLabel("Role:")); form.add(roleBox); form.add(new JLabel("")); form.add(addBtn);
+        JTextField idField = new JTextField(); 
+        JTextField nameField = new JTextField(); 
+        JComboBox<String> roleBox = new JComboBox<>(new String[]{"Student", "Evaluator"}); 
+        JButton addBtn = new JButton("Add User");
+        
+        form.add(new JLabel("ID:")); form.add(idField); 
+        form.add(new JLabel("Name:")); form.add(nameField); 
+        form.add(new JLabel("Role:")); form.add(roleBox); 
+        form.add(new JLabel("")); form.add(addBtn);
+
+        // User Table
         String[] cols = {"User ID", "Name", "Role"};
         userTableModel = new DefaultTableModel(cols, 0);
         JTable table = new JTable(userTableModel);
         
+        // Add User Logic
         addBtn.addActionListener(e -> {
-            String id = idField.getText().trim(); String name = nameField.getText().trim(); String role = (String) roleBox.getSelectedItem();
+            String id = idField.getText().trim(); 
+            String name = nameField.getText().trim(); 
+            String role = (String) roleBox.getSelectedItem();
+            
             if(id.isEmpty() || name.isEmpty()) { JOptionPane.showMessageDialog(this, "Fields cannot be empty."); return; }
             try {
                 User newUser;
                 if(role.equals("Student")) newUser = new Student(id, name, "pass");
                 else newUser = new Evaluator(id, name, "pass");
-                manager.addUser(newUser); refreshAllData();
-                idField.setText(""); nameField.setText(""); JOptionPane.showMessageDialog(this, "Success!");
+
+                manager.addUser(newUser);   // Saves to file
+                refreshAllData();           // Update table
+
+                idField.setText(""); nameField.setText(""); 
+                JOptionPane.showMessageDialog(this, "Success!");
             } catch(IllegalArgumentException ex) { JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage()); }
         });
 
+        // Delete User Logic
         JButton deleteUserBtn = new JButton("Remove Selected User");
         deleteUserBtn.addActionListener(e -> {
             int row = table.getSelectedRow();
             if(row == -1) { JOptionPane.showMessageDialog(this, "Select a user to remove."); return; }
+            
             String uid = (String) userTableModel.getValueAt(row, 0);
             manager.deleteUser(uid); 
             refreshAllData();
@@ -362,16 +467,20 @@ public class CoordinatorView extends JPanel {
         return panel;
     }
 
+    // --- REFRESH ALL DATA IN TABS ---
     private void refreshAllData() {
+        // Refresh Session Table 
         sessionTableModel.setRowCount(0); assignSessionBox.removeAllItems();
         for(SeminarSession s : manager.getAllSessions()) {
             sessionTableModel.addRow(new Object[]{s.getSessionId(), s.getDate(), s.getTime(), s.getVenue(), s.getType()});
             assignSessionBox.addItem(s);
         }
 
+        // Clear Assignment Lists
         ((DefaultListModel<User>)assignEvaluatorList.getModel()).clear();
         ((DefaultListModel<Presentation>)assignPresenterList.getModel()).clear();
         
+        // Refresh User Management Table
         if(userTableModel != null) {
             userTableModel.setRowCount(0);
             List<User> allUsers = new ArrayList<>();
@@ -381,6 +490,7 @@ public class CoordinatorView extends JPanel {
             for(User u : allUsers) userTableModel.addRow(new Object[]{u.getId(), u.getUsername(), u.getClass().getSimpleName()});
         }
         
+        // Refresh Voting Table
         if(voteTableModel != null) {
             voteTableModel.setRowCount(0);
             for(Presentation p : manager.getAllPresentations()) {

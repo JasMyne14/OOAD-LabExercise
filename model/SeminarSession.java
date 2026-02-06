@@ -2,12 +2,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+// Seminar Session Class
 public class SeminarSession implements Serializable {
-    private String sessionId;
-    private String date;
-    private String time; 
-    private String venue;
-    private String type; 
+    private String sessionId;      // Unique ID
+    private String date;           // Format: DD/MM/YYYY
+    private String time;           // Format: HH:MM - HH:MM
+    private String venue;          // Venue Name
+    private String type;           // "Oral" or "Poster"
+    
     private List<String> assignedEvaluatorIds;
     private List<String> assignedStudentIds;
 
@@ -21,12 +23,14 @@ public class SeminarSession implements Serializable {
         this.assignedStudentIds = new ArrayList<>();
     }
 
+    // Getters
     public String getSessionId() { return sessionId; }
     public String getDate() { return date; }
     public String getTime() { return time; } 
     public String getVenue() { return venue; }
     public String getType() { return type; }
     
+    // Returns the lists of IDs so the CoordinatorView can modify them
     public List<String> getEvaluatorIds() { return assignedEvaluatorIds; }
     public List<String> getStudentIds() { return assignedStudentIds; }
     

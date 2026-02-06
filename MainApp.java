@@ -1,55 +1,112 @@
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*; 
 
+// Main Application Class (Card Layout for Login and Dashboards)
 public class MainApp extends JFrame {
-    private SeminarManager manager;
-    private JPanel mainPanel;
-    private CardLayout cardLayout;
+    private SeminarManager manager;    // Central service for data handling
+    private JPanel mainPanel;          // The container for all screens (Login vs Dashboard)
+    private CardLayout cardLayout;     // CardLayout to switch between views
 
     public MainApp() {
-        manager = new SeminarManager();
+        // 1. Initialize the Data Manager (Loads data from file immediately)
+        manager = new SeminarManager(); 
+
+        // 2. Setup the Main Window
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
-        setupLogin();
+        // 3. Setup Screens
+        setupLogin();   // Enhanced Login Screen
         
+        // 4. Final Window Configuration
         add(mainPanel);
-        setTitle("FCI Seminar System");
-        setSize(900, 700); // Made it slightly bigger for the top bar
+        setTitle("FCI Post Graduate Academic Seminar System");
+        setSize(900, 700); 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(null); // Center on screen
         setVisible(true);
     }
 
+    // --- ENHANCED LOGIN SCREEN ---
     private void setupLogin() {
         JPanel loginPanel = new JPanel(new GridBagLayout());
+        loginPanel.setBackground(Color.WHITE); // Clean white background for login
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.insets = new Insets(5, 10, 5, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridwidth = 2; // Allow headers to span across columns
 
+        // 1. SYSTEM NAME (Title)
+        JLabel titleLbl = new JLabel("FCI Post Graduate Academic Seminar System", SwingConstants.CENTER);
+        titleLbl.setFont(new Font("SansSerif", Font.BOLD, 24));
+        titleLbl.setForeground(new Color(40, 60, 100)); // Professional Dark Blue
+        
+        // 2. DESCRIPTION
+        JLabel descLbl = new JLabel("<html><center>A comprehensive platform for scheduling seminars,<br>"
+                + "managing presentations, and conducting evaluations.</center></html>", SwingConstants.CENTER);
+        descLbl.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        descLbl.setForeground(Color.DARK_GRAY);
+        
+        // 3. INSTRUCTIONS
+        JLabel instrLbl = new JLabel("Please enter your User ID and select your Role to log in:", SwingConstants.CENTER);
+        instrLbl.setFont(new Font("SansSerif", Font.ITALIC, 12));
+        instrLbl.setBorder(BorderFactory.createEmptyBorder(15, 0, 10, 0)); // Spacing
+
+        // --- INPUT FIELDS ---
         JTextField userField = new JTextField(15);
         JComboBox<String> roleBox = new JComboBox<>(new String[]{"Student", "Evaluator", "Coordinator"});
-        JButton loginBtn = new JButton("Login");
+        JButton loginBtn = new JButton("Login to System");
+        
+        // Style the login button
+        loginBtn.setBackground(new Color(70, 130, 180)); // Steel Blue
+        loginBtn.setForeground(Color.WHITE);
+        loginBtn.setFont(new Font("SansSerif", Font.BOLD, 13));
+        loginBtn.setPreferredSize(new Dimension(150, 35));
 
-        // UI Layout
-        gbc.gridx=0; gbc.gridy=0; loginPanel.add(new JLabel("User ID:"), gbc);
+        // --- ADDING COMPONENTS TO LAYOUT ---
+        
+        // Header Section
+        gbc.gridx=0; gbc.gridy=0; loginPanel.add(titleLbl, gbc);
+        gbc.gridx=0; gbc.gridy=1; loginPanel.add(descLbl, gbc);
+        gbc.gridx=0; gbc.gridy=2; loginPanel.add(instrLbl, gbc);
+        gbc.gridx=0; gbc.gridy=3; loginPanel.add(new JSeparator(), gbc); // Line divider
+
+        // Input Section (Reset gridwidth to 1)
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+        // User ID Row
+        gbc.gridx=0; gbc.gridy=4; 
+        JLabel idLabel = new JLabel("User ID:", SwingConstants.RIGHT);
+        idLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
+        loginPanel.add(idLabel, gbc);
         gbc.gridx=1; loginPanel.add(userField, gbc);
         
-        gbc.gridx=0; gbc.gridy=1; loginPanel.add(new JLabel("Role:"), gbc);
+        // Role Row
+        gbc.gridx=0; gbc.gridy=5; 
+        JLabel roleLabel = new JLabel("Role:", SwingConstants.RIGHT);
+        roleLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
+        loginPanel.add(roleLabel, gbc);
         gbc.gridx=1; loginPanel.add(roleBox, gbc);
         
-        gbc.gridx=1; gbc.gridy=2; loginPanel.add(loginBtn, gbc);
+        // Button Row (Centered)
+        gbc.gridwidth = 2;
+        gbc.gridx=0; gbc.gridy=6; 
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
+        loginPanel.add(loginBtn, gbc);
 
         // --- LOGIN LOGIC ---
         loginBtn.addActionListener(e -> {
             try {
                 String role = (String)roleBox.getSelectedItem();
                 String id = userField.getText().trim();
-                
+
+                // Authenticate User
                 User u = manager.login(id, role);
                 
                 if(u != null) {
-                    // Create the Dashboard View based on role
+                    // Successful Login: Create the Dashboard View based on role
                     JPanel specificView = null;
                     if(u instanceof Coordinator) {
                         specificView = new CoordinatorView(manager);
@@ -60,13 +117,13 @@ public class MainApp extends JFrame {
                     }
 
                     if(specificView != null) {
-                        // WRAPPER: Add a Top Bar with Logout
+                        // Top Bar with Logout
                         JPanel dashboardWrapper = new JPanel(new BorderLayout());
                         
-                        // 1. Create Top Bar
+                        // Create Top Bar (USING YOUR PINK COLOR)
                         JPanel topBar = new JPanel(new BorderLayout());
                         topBar.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-                        topBar.setBackground(new Color(230, 230, 230)); // Light Gray
+                        topBar.setBackground(new Color(244, 194, 194)); // Pink
                         
                         JLabel welcomeLbl = new JLabel("Welcome, " + u.getUsername() + " (" + role + ")");
                         welcomeLbl.setFont(new Font("SansSerif", Font.BOLD, 14));
@@ -78,16 +135,15 @@ public class MainApp extends JFrame {
                         topBar.add(welcomeLbl, BorderLayout.WEST);
                         topBar.add(logoutBtn, BorderLayout.EAST);
 
-                        // 2. Assemble Dashboard
+                        // Assemble Dashboard
                         dashboardWrapper.add(topBar, BorderLayout.NORTH);
                         dashboardWrapper.add(specificView, BorderLayout.CENTER);
 
-                        // 3. Show it
+                        // Show Dashboard
                         mainPanel.add(dashboardWrapper, "DASH");
                         cardLayout.show(mainPanel, "DASH");
                         
-                        // Clear password field for security (optional)
-                        userField.setText("");
+                        userField.setText(""); // Clear password field for security 
                     }
                 } else {
                     JOptionPane.showMessageDialog(this, "Login Failed.\nUser ID not found for role: " + role);
@@ -103,21 +159,8 @@ public class MainApp extends JFrame {
 
     // --- LOGOUT LOGIC ---
     public void logout() {
-        // 1. Switch back to login screen
+        // Switch back to login screen
         cardLayout.show(mainPanel, "LOGIN");
-        
-        // 2. Remove the old dashboard from memory (so next login is fresh)
-        // We iterate to find the "DASH" component and remove it
-        for (Component comp : mainPanel.getComponents()) {
-            if (comp != null && !comp.getClass().getSimpleName().equals("LoginPanel") 
-                    && comp instanceof JPanel && comp != mainPanel) {
-                // If it's not the main panel, we assume it's the dashboard wrapper
-                // (Simple check: removing the last added component usually works too)
-            }
-        }
-        // Actually, CardLayout keeps components. Let's just remove the one named "DASH" if we can,
-        // or simpler: just rely on the fact that we create a NEW "DASH" panel every login.
-        // The garbage collector will handle the old one eventually.
     }
 
     public static void main(String[] args) {

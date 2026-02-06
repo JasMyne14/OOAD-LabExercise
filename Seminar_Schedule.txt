@@ -7,24 +7,43 @@ SESSION: S-2659
   Type: Oral
   
 Evaluators:
-    - Prof. Josh (E001)
+    - Dr. Lim (E002)
   
 Presentations:
-    - "Roses Are Blue" by Jasmyne Yap
+    - "Perfect Data Mining" by Enath
+    - "Engineering with Web Engineers" by Nurul
 
 --------------------------------------------------
 
-SESSION: S-9533
+SESSION: S-9849
+  Date: 20/04/2026
+  Time: 08:30 - 10:00
+  Venue: Dataran Ilmu
+  Type: Oral
+  
+Evaluators:
+    - Prof. Josh (E001)
+    - Dr. Lim (E002)
+  
+Presentations:
+    - "Perfect Data Mining" by Enath
+    - "Engineering with Web Engineers" by Nurul
+
+--------------------------------------------------
+
+SESSION: S-3377
   Date: 16/04/2026
-  Time: 14:00 - !6:00
-  Venue: MPH
+  Time: 14:00 - 16:00
+  Venue: MPH Hall
   Type: Poster
   
 Evaluators:
+    - Prof. Josh (E001)
     - Dr. Lim (E002)
   
 Presentations:
     - "Violets are Blue" by Wan Hanani
+    - "CyberSecurity" by Jasmyne Yap
 
 --------------------------------------------------
 

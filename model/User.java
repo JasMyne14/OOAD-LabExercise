@@ -1,9 +1,10 @@
 import java.io.Serializable;
 
+// Abstract User Class
 public abstract class User implements Serializable {
-    private String id;
-    private String username;
-    private String password; // Simple placeholder
+    private String id;          // Unique ID
+    private String username;    // Username
+    private String password;    // Simple placeholder
 
     public User(String id, String username, String password) {
         this.id = id;
