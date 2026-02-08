@@ -1,7 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
-
+import java.io.File; // Needed for file opening
 
 // Evaluator Dashboard View
 public class EvaluatorView extends JPanel {
@@ -12,6 +12,12 @@ public class EvaluatorView extends JPanel {
     private JButton submitBtn, editBtn;
     private JList<Presentation> pList;
     
+    // Details Components 
+    private JTextArea abstractArea;
+    private JTextField supervisorField;
+    private JButton openFileBtn;
+    private String currentFilePath;
+
     // Data references
     private SeminarManager manager;
     private Evaluator evaluator; // Logged-in evaluator
@@ -59,7 +65,38 @@ public class EvaluatorView extends JPanel {
         listScroll.setPreferredSize(new Dimension(250, 0));
         listScroll.setBorder(BorderFactory.createTitledBorder("Assigned to Me"));
 
-        // --- RIGHT SIDE: EVALUATION FORM ---
+        // --- RIGHT SIDE: SPLIT INTO DETAILS (TOP) AND FORM (BOTTOM) ---
+        JPanel rightPanel = new JPanel(new BorderLayout(0, 10));
+
+        // 1. TOP: Student Details Panel
+        JPanel detailsPanel = new JPanel(new GridBagLayout());
+        detailsPanel.setBorder(BorderFactory.createTitledBorder("Presentation Details"));
+        GridBagConstraints g = new GridBagConstraints();
+        g.insets = new Insets(5, 5, 5, 5);
+        g.fill = GridBagConstraints.HORIZONTAL;
+        
+        abstractArea = new JTextArea(4, 30);
+        abstractArea.setLineWrap(true);
+        abstractArea.setWrapStyleWord(true);
+        abstractArea.setEditable(false);
+        abstractArea.setBackground(new Color(240, 240, 240));
+        
+        supervisorField = new JTextField();
+        supervisorField.setEditable(false);
+        
+        openFileBtn = new JButton("View Attached File");
+        openFileBtn.setEnabled(false); // Disabled until student selected
+        
+        // Layout Details
+        g.gridx=0; g.gridy=0; detailsPanel.add(new JLabel("Abstract:"), g);
+        g.gridx=1; g.gridy=0; detailsPanel.add(new JScrollPane(abstractArea), g);
+        
+        g.gridx=0; g.gridy=1; detailsPanel.add(new JLabel("Supervisor:"), g);
+        g.gridx=1; g.gridy=1; detailsPanel.add(supervisorField, g);
+        
+        g.gridx=1; g.gridy=2; detailsPanel.add(openFileBtn, g);
+
+        // 2. BOTTOM: Evaluation Form
         JPanel formPanel = new JPanel();
         formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
         formPanel.setBorder(BorderFactory.createTitledBorder("Evaluation Rubric"));
@@ -97,6 +134,10 @@ public class EvaluatorView extends JPanel {
         formPanel.add(Box.createVerticalStrut(10));
         formPanel.add(btnPanel);
 
+        // Assemble Right Panel
+        rightPanel.add(detailsPanel, BorderLayout.NORTH);
+        rightPanel.add(formPanel, BorderLayout.CENTER);
+
         // --- LISTENERS ---
 
         // 1. LIST SELECTION: Load data & determine state
@@ -106,14 +147,32 @@ public class EvaluatorView extends JPanel {
             }
         });
 
-        // 2. EDIT BUTTON: Unlock the form
+        // 2. OPEN FILE BUTTON
+        openFileBtn.addActionListener(e -> {
+            if(currentFilePath != null && !currentFilePath.isEmpty()) {
+                try {
+                    File file = new File(currentFilePath);
+                    if(file.exists()) {
+                        Desktop.getDesktop().open(file);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "File not found: " + currentFilePath);
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, "Error opening file: " + ex.getMessage());
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "No file uploaded for this student.");
+            }
+        });
+
+        // 3. EDIT BUTTON: Unlock the form
         editBtn.addActionListener(e -> {
             setFormEnabled(true);    // Enable sliders
             submitBtn.setEnabled(true);    // Enable save button
             editBtn.setEnabled(false);     // Cannot edit while editing
         });
 
-        // 3. SUBMIT BUTTON: Save and Lock
+        // 4. SUBMIT BUTTON: Save and Lock
         submitBtn.addActionListener(e -> {
             Presentation selected = pList.getSelectedValue();
             if(selected == null) return;
@@ -145,13 +204,19 @@ public class EvaluatorView extends JPanel {
 
         // Add components to main panel
         add(listScroll, BorderLayout.WEST);
-        add(formPanel, BorderLayout.CENTER);
+        add(rightPanel, BorderLayout.CENTER); // Changed from formPanel to rightPanel
     }
 
     // --- LOGIC: Load Existing Data ---
     // Determine if the form should be in read-only or editable state
     private void loadPresentationData(Presentation p) {
         if (p == null) return;
+
+        // Load Presentation Details
+        abstractArea.setText(p.getAbstractText());
+        supervisorField.setText(p.getSupervisor());
+        currentFilePath = p.getFilePath();
+        openFileBtn.setEnabled(true);
 
         // Find if I have already graded this student
         Evaluation existing = null;

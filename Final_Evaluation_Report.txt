@@ -1,65 +1,65 @@
 *************************************************************
-              DETAILED SEMINAR EVALUATION REPORT             
-             Generated on: 2026-02-06
+              FINAL EVALUATION REPORT             
+             Generated on: 2026-02-08
 *************************************************************
 
-STUDENT: Wan Hanani                | ID: S002
-TITLE:   Violets are Blue                                  
-TYPE:    Poster [Board: B-01]     
+STUDENT: Jasmyne Yap               | ID: S001
+TITLE:   AI Comes Alive                                    
+TYPE:    Oral                     
 -------------------------------------------------------------
-   > Evaluator: Dr. Lim
-     [Scores] Clarity: 4 | Method: 3 | Results: 4 | Pres: 4
-     [Comment] "Good."
-
    > Evaluator: Prof. Josh
      [Scores] Clarity: 4 | Method: 4 | Results: 5 | Pres: 4
-     [Comment] "Presentation was enjoyable."
+     [Comment] "Good Presentation flow."
+
+   > Evaluator: Dr. Lim
+     [Scores] Clarity: 3 | Method: 3 | Results: 5 | Pres: 4
+     [Comment] "Nice nice."
 
 FINAL AVERAGE SCORE: 16.00 / 20.00
 =============================================================
 
-STUDENT: Jasmyne Yap               | ID: S001
-TITLE:   CyberSecurity                                     
-TYPE:    Poster [Board: B-02]     
+STUDENT: Wan Hanani                | ID: S002
+TITLE:   Cyber Security is Important                       
+TYPE:    Poster [Board: B-01]     
 -------------------------------------------------------------
-   > Evaluator: Dr. Lim
-     [Scores] Clarity: 4 | Method: 4 | Results: 5 | Pres: 5
-     [Comment] "Amazing"
-
    > Evaluator: Prof. Josh
-     [Scores] Clarity: 4 | Method: 3 | Results: 4 | Pres: 5
-     [Comment] "Good work."
+     [Scores] Clarity: 4 | Method: 4 | Results: 5 | Pres: 4
+     [Comment] "Interresting viewpoint"
+
+   > Evaluator: Dr. Lim
+     [Scores] Clarity: 4 | Method: 4 | Results: 5 | Pres: 4
+     [Comment] "Amazing."
 
 FINAL AVERAGE SCORE: 17.00 / 20.00
 =============================================================
 
 STUDENT: Enath                     | ID: S003
-TITLE:   Perfect Data Mining                               
+TITLE:   Data Science is Scienecing                        
 TYPE:    Oral                     
 -------------------------------------------------------------
    > Evaluator: Prof. Josh
      [Scores] Clarity: 4 | Method: 4 | Results: 5 | Pres: 4
-     [Comment] "Good flow."
+     [Comment] "Very good."
 
    > Evaluator: Dr. Lim
-     [Scores] Clarity: 4 | Method: 4 | Results: 3 | Pres: 4
-     [Comment] "Well Done"
+     [Scores] Clarity: 3 | Method: 4 | Results: 5 | Pres: 3
+     [Comment] "Sciencinggg."
 
 FINAL AVERAGE SCORE: 16.00 / 20.00
 =============================================================
 
 STUDENT: Nurul                     | ID: S004
-TITLE:   Engineering with Web Engineers                    
-TYPE:    Oral                     
+TITLE:   Amazing Game Dev                                  
+TYPE:    Poster [Board: B-02]     
 -------------------------------------------------------------
-   > Evaluator: Dr. Lim
-     [Scores] Clarity: 4 | Method: 3 | Results: 3 | Pres: 2
-     [Comment] "Can Improve."
-
    > Evaluator: Prof. Josh
-     [Scores] Clarity: 3 | Method: 4 | Results: 5 | Pres: 4
-     [Comment] "Good Presentation Flow"
+     [Scores] Clarity: 4 | Method: 5 | Results: 4 | Pres: 4
+     [Comment] "Nice talk."
 
-FINAL AVERAGE SCORE: 14.00 / 20.00
+   > Evaluator: Dr. Lim
+     [Scores] Clarity: 4 | Method: 4 | Results: 4 | Pres: 4
+     [Comment] "Decent work."
+
+FINAL AVERAGE SCORE: 16.50 / 20.00
 =============================================================
 

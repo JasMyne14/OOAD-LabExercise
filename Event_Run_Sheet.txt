@@ -1,6 +1,9 @@
 EVENT RUN SHEET & PROTOCOL
 Event: Annual Research Seminar
-Generated: 2026-02-06
+Date:  20/04/2026
+Time:  14:00 - 17:00
+Venue: Main Grand Hall
+Generated: 2026-02-08
 =========================================================================
 TIME       | ACTIVITY / MILESTONE                     | REMARKS             
 =========================================================================

@@ -38,6 +38,12 @@ public class Presentation implements Serializable {
     public String getTitle() { return title; }
     public String getType() { return type; }
     public String getStudentName() { return studentName; }
+    
+    // Getter for Evaluation Details
+    public String getAbstractText() { return abstractText; }
+    public String getSupervisor() { return supervisor; }
+    public String getFilePath() { return filePath; }
+
     // Poster Management 
     public void setBoardId(String id) { this.boardId = id; }
     public String getBoardId() { return boardId; }

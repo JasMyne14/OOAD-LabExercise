@@ -194,7 +194,7 @@ public class CoordinatorView extends JPanel {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
         
         JButton scheduleBtn = new JButton("Generate Seminar Schedule (.txt)");
-        JButton reportBtn = new JButton("Generate Detailed Evaluation Report (.txt)");
+        JButton reportBtn = new JButton("Generate Final Evaluation Report (.txt)");
         JButton analyticsBtn = new JButton("Show Analytics Dashboard");
 
         Dimension size = new Dimension(280, 50);
@@ -202,7 +202,7 @@ public class CoordinatorView extends JPanel {
         reportBtn.setPreferredSize(size);
         analyticsBtn.setPreferredSize(size);
 
-        // --- BUTTON STYLING (Pastel Professional Theme) ---
+        // --- BUTTON STYLING (Pastel Theme) ---
         
         // 1. Schedule Button (Pastel Blue)
         scheduleBtn.setBackground(new Color(184, 215, 233)); 
@@ -263,7 +263,7 @@ public class CoordinatorView extends JPanel {
         reportBtn.addActionListener(e -> {
             try (FileWriter fw = new FileWriter("Final_Evaluation_Report.txt")) {
                 fw.write("*************************************************************\n");
-                fw.write("              DETAILED SEMINAR EVALUATION REPORT             \n");
+                fw.write("              FINAL EVALUATION REPORT             \n");
                 fw.write("             Generated on: " + java.time.LocalDate.now() + "\n");
                 fw.write("*************************************************************\n\n");
                 
@@ -349,7 +349,7 @@ public class CoordinatorView extends JPanel {
         return panel;
     }
 
-    // --- TAB 4: Awards and Voting---
+// --- TAB 4: Awards and Voting---
     private JPanel createAwardPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         
@@ -377,7 +377,7 @@ public class CoordinatorView extends JPanel {
 
         JTextArea resultsArea = new JTextArea(10, 40); resultsArea.setEditable(false); resultsArea.setFont(new Font("Monospaced", Font.BOLD, 14));
         
-        // Calculate Winners (Best Oral, Best Poster, People's Choice)
+        // Calculate Winners
         JButton calculateBtn = new JButton("Generate Award Winners");
         calculateBtn.addActionListener(e -> {
             Presentation bestOral = null, bestPoster = null, peopleChoice = null; 
@@ -385,11 +385,8 @@ public class CoordinatorView extends JPanel {
         
             for(Presentation p : manager.getAllPresentations()) {
                 double avg = p.getEvaluations().stream().mapToInt(Evaluation::getTotal).average().orElse(0.0);
-                
-                // Determine Category Winners based on Scores
                 if(p.getType().equals("Oral") && avg > maxOral) { maxOral = avg; bestOral = p; }
                 if(p.getType().equals("Poster") && avg > maxPoster) { maxPoster = avg; bestPoster = p; }
-                // Determine People's Choice based on Votes
                 if(p.getAudienceVotes() > maxVote) { maxVote = p.getAudienceVotes(); peopleChoice = p; }
             }
 
@@ -400,30 +397,48 @@ public class CoordinatorView extends JPanel {
             resultsArea.setText(sb.toString());
         });
 
-        // --- AGENDA FORMAT (Event Run Sheet) ---
+        // --- AGENDA FORMAT (Ask for Date/Time) ---
         JButton agendaBtn = new JButton("Generate Event Run Sheet");
         agendaBtn.addActionListener(e -> {
-             try (FileWriter fw = new FileWriter("Event_Run_Sheet.txt")) {
-                fw.write("EVENT RUN SHEET & PROTOCOL\n");
-                fw.write("Event: Annual Research Seminar\n");
-                fw.write("Generated: " + java.time.LocalDate.now() + "\n");
-                fw.write("=========================================================================\n");
-                fw.write(String.format("%-10s | %-40s | %-20s\n", "TIME", "ACTIVITY / MILESTONE", "REMARKS"));
-                fw.write("=========================================================================\n");
-                fw.write(String.format("%-10s | %-40s | %-20s\n", "14:00", "Guest Arrival & Registration", "Front Desk Team"));
-                fw.write(String.format("%-10s | %-40s | %-20s\n", "14:15", "Welcoming Speech (Dean)", "Stage Ready"));
-                fw.write(String.format("%-10s | %-40s | %-20s\n", "14:30", "Keynote: Innovation in Tech", "Projector On"));
-                fw.write("-------------------------------------------------------------------------\n");
-                fw.write(String.format("%-10s | %-40s | %-20s\n", "15:00", "AWARD CEREMONY COMMENCES", "MC Announce"));
-                fw.write(String.format("%-10s | %-40s | %-20s\n", "     ", " - Best Oral Presenter", "Prepare Trophy"));
-                fw.write(String.format("%-10s | %-40s | %-20s\n", "     ", " - Best Poster Presenter", "Prepare Trophy"));
-                fw.write(String.format("%-10s | %-40s | %-20s\n", "     ", " - People's Choice Award", "Check Live Votes"));
-                fw.write("-------------------------------------------------------------------------\n");
-                fw.write(String.format("%-10s | %-40s | %-20s\n", "15:45", "Photography Session", "Group Photo"));
-                fw.write(String.format("%-10s | %-40s | %-20s\n", "16:00", "Refreshments & End", "Catering Team"));
-                
-                JOptionPane.showMessageDialog(this, "Run Sheet generated as 'Event_Run_Sheet.txt'");
-            } catch(Exception ex) { ex.printStackTrace(); }
+            // Ask user for details first
+            JTextField eventDate = new JTextField("20/04/2026");
+            JTextField eventTime = new JTextField("14:00 - 17:00");
+            JTextField eventVenue = new JTextField("Main Grand Hall");
+            
+            JPanel inputPanel = new JPanel(new GridLayout(3, 2));
+            inputPanel.add(new JLabel("Ceremony Date:")); inputPanel.add(eventDate);
+            inputPanel.add(new JLabel("Ceremony Time:")); inputPanel.add(eventTime);
+            inputPanel.add(new JLabel("Ceremony Venue:")); inputPanel.add(eventVenue);
+
+            int result = JOptionPane.showConfirmDialog(null, inputPanel, "Enter Award Ceremony Details", JOptionPane.OK_CANCEL_OPTION);
+
+            if(result == JOptionPane.OK_OPTION) {
+                 try (FileWriter fw = new FileWriter("Event_Run_Sheet.txt")) {
+                    fw.write("EVENT RUN SHEET & PROTOCOL\n");
+                    fw.write("Event: Annual Research Seminar\n");
+                    // Use inputs here
+                    fw.write("Date:  " + eventDate.getText() + "\n");
+                    fw.write("Time:  " + eventTime.getText() + "\n");
+                    fw.write("Venue: " + eventVenue.getText() + "\n");
+                    fw.write("Generated: " + java.time.LocalDate.now() + "\n");
+                    fw.write("=========================================================================\n");
+                    fw.write(String.format("%-10s | %-40s | %-20s\n", "TIME", "ACTIVITY / MILESTONE", "REMARKS"));
+                    fw.write("=========================================================================\n");
+                    fw.write(String.format("%-10s | %-40s | %-20s\n", "14:00", "Guest Arrival & Registration", "Front Desk Team"));
+                    fw.write(String.format("%-10s | %-40s | %-20s\n", "14:15", "Welcoming Speech (Dean)", "Stage Ready"));
+                    fw.write(String.format("%-10s | %-40s | %-20s\n", "14:30", "Keynote: Innovation in Tech", "Projector On"));
+                    fw.write("-------------------------------------------------------------------------\n");
+                    fw.write(String.format("%-10s | %-40s | %-20s\n", "15:00", "AWARD CEREMONY COMMENCES", "MC Announce"));
+                    fw.write(String.format("%-10s | %-40s | %-20s\n", "     ", " - Best Oral Presenter", "Prepare Trophy"));
+                    fw.write(String.format("%-10s | %-40s | %-20s\n", "     ", " - Best Poster Presenter", "Prepare Trophy"));
+                    fw.write(String.format("%-10s | %-40s | %-20s\n", "     ", " - People's Choice Award", "Check Live Votes"));
+                    fw.write("-------------------------------------------------------------------------\n");
+                    fw.write(String.format("%-10s | %-40s | %-20s\n", "15:45", "Photography Session", "Group Photo"));
+                    fw.write(String.format("%-10s | %-40s | %-20s\n", "16:00", "Refreshments & End", "Catering Team"));
+                    
+                    JOptionPane.showMessageDialog(this, "Run Sheet generated as 'Event_Run_Sheet.txt'");
+                } catch(Exception ex) { ex.printStackTrace(); }
+            }
         });
 
         JPanel top = new JPanel(new BorderLayout()); top.setBorder(BorderFactory.createTitledBorder("Manual Vote Entry")); top.add(new JScrollPane(voteTable), BorderLayout.CENTER); top.add(updateVotesBtn, BorderLayout.SOUTH);
